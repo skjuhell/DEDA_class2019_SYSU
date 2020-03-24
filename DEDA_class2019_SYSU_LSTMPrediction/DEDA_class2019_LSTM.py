@@ -84,10 +84,13 @@ class LSTM_Model():
 		test = pd.DataFrame(idx.raw_data.close.iloc[idx.test_start_index:idx.test_end_index]).set_index(idx.raw_data.date.iloc[idx.test_start_index:idx.test_end_index])
 		preds = pd.DataFrame(self.preds).set_index(idx.raw_data.date.iloc[idx.test_start_index+idx.seq_len:idx.test_end_index])
 		
-		plt.plot(ts)
-		plt.plot(train)
-		plt.plot(test)
-		plt.plot(preds)
+
+		plt.plot(ts,label='omitted')
+		plt.plot(train,label='train')
+		plt.plot(test,label='test')
+		plt.plot(preds,label='pred')
+		plt.legend(loc='center left', bbox_to_anchor=(1, 0.87))
+		
 		plt.xticks(ts.index[np.arange(1,ts.shape[0],50)],rotation=45)
 		plt.show()
 
@@ -97,8 +100,16 @@ class LSTM_Model():
 idx=IndexData()
 idx.minmax_scale_close_price(0,1)
 
-idx.select_train_period(start='2017-01-03',end='2017-11-30')
-idx.select_test_period(start='2017-11-30',end='2018-11-20')
+#Train before peak, predict after peak
+idx.select_test_period(start='2017-01-03',end='2017-11-30')
+idx.select_train_period(start='2017-11-30',end='2018-11-20')
+
+'''
+#Train after peak, predict before peak
+idx.select_test_period(start='2017-01-03',end='2017-11-30')
+idx.select_train_period(start='2017-11-30',end='2018-11-20')
+'''
+
 idx.assemble_data(seq_len=60)
 
 # Feed data to LSTM, train, predict test sample
